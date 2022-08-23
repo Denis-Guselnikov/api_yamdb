@@ -9,37 +9,48 @@ ROLES = [
 
 
 class User(AbstractUser):
-    username = models.CharField('Имя пользователя',
-                                max_length=150,
-                                unique=True,
-                                blank=False,
-                                null=False
-                                )
-    email = models.EmailField('Почта',
-                              max_length=254,
-                              unique=True,
-                              blank=False,
-                              null=False
-                              )
-    first_name = models.CharField('Первое имя',
-                                  max_length=150,
-                                  blank=True)
-    last_name = models.CharField('Фамилия',
-                                 max_length=150,
-                                 blank=True)
-    bio = models.TextField('Биография',
-                           blank=True,
-                           )
-    role = models.CharField('Роль',
-                            choices=ROLES,
-                            default='user',
-                            blank=True
-                            )
-    confirmation_code = models.CharField('Код подтверждения',
-                                         max_length=255,
-                                         null=True,
-                                         blank=False,
-                                         default='')
+    username = models.CharField(
+        'Имя пользователя',
+        max_length=150,
+        unique=True,
+        blank=False,
+        null=False
+    )
+    email = models.EmailField(
+        'Почта',
+        max_length=254,
+        unique=True,
+        blank=False,
+        null=False
+    )
+    first_name = models.CharField(
+        'Первое имя',
+        max_length=150,
+        blank=True
+    )
+    last_name = models.CharField(
+        'Фамилия',
+        max_length=150,
+        blank=True
+    )
+    bio = models.TextField(
+        'Биография',
+        blank=True
+    )
+    role = models.CharField(
+        'Роль',
+        max_length=255,
+        choices=ROLES,
+        default='user',
+        blank=True
+    )
+    confirmation_code = models.CharField(
+        'Код подтверждения',
+        max_length=255,
+        null=True,
+        blank=False,
+        default=''
+    )
 
 
 class Review(models.Model):
