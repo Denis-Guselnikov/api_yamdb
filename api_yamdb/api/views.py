@@ -8,15 +8,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.serializers import (SignUpSerializer,
-                             TokenGetSerializer,
-                             UserSerializer)
-from api.permissions import IsAdminOnly
+from api.serializers import (SignUpSerializer, TokenGetSerializer,
+                             CategorySerializer, UserSerializer,
+                             GenreSerializer, TitleSerializer,
+                             TitlesSerializer)
+from api.permissions import IsAdminOnly, AdminOrReadOnlyPermission
 
-from reviews.models import User
+from reviews.models import User, Category, Genre, Title
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -74,3 +75,48 @@ def get_token(request):
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer    
+    permission_classes = [AdminOrReadOnlyPermission]
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH',):
+            return TitlesSerializer
+        return TitleSerializer
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer    
+    permission_classes = [AdminOrReadOnlyPermission]
+
+    @action(
+        detail=False, methods=['delete'],
+        url_path=r'(?P<slug>\w+)',
+        lookup_field='slug', url_name='category_slug'
+    )
+    def get_genre(self, request, slug):
+        category = self.get_object()
+        serializer = CategorySerializer(category)
+        category.delete()
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer    
+    permission_classes = (AdminOrReadOnlyPermission,)
+
+    @action(
+        detail=False, methods=['delete'],
+        url_path=r'(?P<slug>\w+)',
+        lookup_field='slug', url_name='category_slug'
+    )
+    def get_category(self, request, slug):
+        category = self.get_object()
+        serializer = CategorySerializer(category)
+        category.delete()
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)

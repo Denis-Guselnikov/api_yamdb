@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MaxValueValidator
+from django.utils import timezone
 
 ROLES = [
     ('admin', 'admin'),
@@ -52,6 +53,18 @@ class User(AbstractUser):
         blank=False,
         default=''
     )
+
+    @property
+    def is_admin(self):
+        return self.is_superuser or self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    @property
+    def is_user(self):
+        return self.role == 'user'
 
 
 class Review(models.Model):
@@ -112,24 +125,27 @@ class Comments(models.Model):
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Категория')
+    name = models.CharField(max_length=255, verbose_name='Категория')
     slug = models.SlugField(unique=True, verbose_name='Слаг категории')
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Genre(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Жанр')
+    name = models.CharField(max_length=255, verbose_name='Жанр')
     slug = models.SlugField(unique=True, verbose_name='Слаг жанра')
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Title(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Произведение')
+    name = models.CharField(max_length=255, verbose_name='Произведение')
     description = models.TextField(verbose_name='Описание')
+    year = models.IntegerField(
+        validators=[MaxValueValidator(timezone.now().year)], verbose_name='Год'
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -145,4 +161,4 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        return self.name
