@@ -60,7 +60,7 @@ def send_code(request):
 
 @api_view(["POST"])
 def get_token(request):
-    """Получение JWT-токена при передаче имени и кода подтверждения."""
+    """Получение JWT-токена при передаче username и confirmation code."""
     serializer = TokenGetSerializer(data=request.data)
     if serializer.is_valid:
         user = get_object_or_404(User,
