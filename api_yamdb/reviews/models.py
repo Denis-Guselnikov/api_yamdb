@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import MaxValueValidator
 
 ROLES = [
     ('admin', 'admin'),
@@ -54,13 +55,60 @@ class User(AbstractUser):
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey()
-    text = models.TextField()
-    score = models.IntegerField()
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор'
+    )
+    text = models.TextField(
+        max_length=255,
+        verbose_name='Отзыв'
+    )
+    title = models.ForeignKey(
+        'Title',
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        blank=True
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True
+    )
+    score = models.IntegerField(
+        verbose_name='Оценка',
+        null=True,
+        validators=[MaxValueValidator(10)]
+    )
 
 
 class Comments(models.Model):
-    pass
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='author_comments',
+        verbose_name='Автор'
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        blank=True, null=True
+    )
+    text = models.TextField(
+        max_length=255,
+        verbose_name='Коментарий'
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата добавления',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['-pub_date']
 
 
 class Category(models.Model):
