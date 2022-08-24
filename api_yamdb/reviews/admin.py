@@ -18,5 +18,3 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username',)
     list_filter = ('username', 'role',)
     empty_value_display = '-пусто-'
-
-
