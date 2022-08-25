@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 
 class IsAdminOnly(BasePermission):
-    """Только для Админа"""
+    """Доступно только для Админа"""
     def has_permission(self, request, view):
         return (request.user.is_admin)
 
