@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -79,7 +81,8 @@ def get_token(request):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer    
+    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)        
     permission_classes = [AdminOrReadOnlyPermission]
 
     def get_serializer_class(self):
@@ -90,7 +93,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
-    serializer_class = GenreSerializer    
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)    
     permission_classes = [AdminOrReadOnlyPermission]
 
     @action(
@@ -107,7 +112,9 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer    
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)    
     permission_classes = (AdminOrReadOnlyPermission,)
 
     @action(
