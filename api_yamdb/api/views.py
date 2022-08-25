@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from .filters import TitleFilter
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -82,7 +83,8 @@ def get_token(request):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend,)        
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter        
     permission_classes = [AdminOrReadOnlyPermission]
 
     def get_serializer_class(self):
