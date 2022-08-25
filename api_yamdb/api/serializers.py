@@ -25,6 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
+class UserAuthorSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio',
+                  'role', 'confirmation_code')
+
+
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True,
                                    validators=[UniqueValidator(
