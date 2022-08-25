@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.utils import timezone
 
@@ -11,11 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio',
-                  'role', 'confirmation_code')
+                  'role')
         validators = [UniqueTogetherValidator(
                       queryset=User.objects.all(),
                       fields=("email",),
-                      message="Данная почта уже числится в БЗ",)]
+                      message="Данная почта уже числится в БД",)]
 
     def validate_username(self, value):
         """Проверяем, пытается ли пользователь
@@ -35,17 +35,10 @@ class UserAuthorSerializer(serializers.ModelSerializer):
                   'role', 'confirmation_code')
 
 
-class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True,
-                                   validators=[UniqueValidator(
-                                       queryset=User.objects.all()), ])
-    username = serializers.CharField(required=True,
-                                     validators=[UniqueValidator(
-                                         queryset=User.objects.all()), ])
-
+class SignUpSerializer(serializers.ModelSerializer):    
     class Meta:
         model = User
-        fields = ('__all__')
+        fields = ('username', 'email',)
 
     def validate_username(self, value):
         """Проверяем, пытается ли пользователь
@@ -61,7 +54,7 @@ class TokenGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('__all__')
+        fields = ('username', 'confirmation_code')
 
 
 class CategorySerializer(serializers.ModelSerializer):

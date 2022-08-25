@@ -16,9 +16,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import (SignUpSerializer, TokenGetSerializer,
                              CategorySerializer, UserAuthorSerializer,
-                             UserSerializer,
-                             GenreSerializer, TitleSerializer,
-                             TitlesSerializer)
+                             UserSerializer, GenreSerializer,
+                             TitleSerializer, TitlesSerializer)
 from api.permissions import IsAdminOnly, AdminOrReadOnlyPermission
 
 from reviews.models import User, Category, Genre, Title
@@ -27,20 +26,21 @@ from reviews.models import User, Category, Genre, Title
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated, IsAdminOnly)
+    permission_classes = (IsAuthenticated, IsAdminOnly, )
     filter_backends = (SearchFilter, )
-    search_fields = ['username', ]
+    search_fields = ('username',)
+    lookup_field = 'username'
 
     def perform_create(self, serializer):
         email = self.request.data.get('email')
         if User.objects.filter(email=email):
-            return Response('Данная почта уже числится в БЗ',
+            return Response('Данная почта уже числится в БД',
                             status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
 
     @action(methods=['GET', 'PATCH'],
             detail=False,
-            permission_classes=IsAuthenticated)
+            permission_classes=[IsAuthenticated])
     def me(self, request):
         if request.method == 'GET':
             serializer = UserSerializer(request.user)
@@ -85,9 +85,10 @@ def get_token(request):
     """Получение JWT-токена при передаче username и confirmation code."""
     serializer = TokenGetSerializer(data=request.data)
     if serializer.is_valid():
-        user = get_object_or_404(User,
-                                 username=serializer.validated_data['username']
-                                 )
+        user = get_object_or_404(
+            User,
+            username=serializer.validated_data['username']
+        )
         if serializer.validated_data.get(
                 'confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token

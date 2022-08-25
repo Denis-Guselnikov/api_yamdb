@@ -125,26 +125,42 @@ class Comments(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Категория')
-    slug = models.SlugField(unique=True, verbose_name='Слаг категории')
+    name = models.CharField(
+        max_length=255,
+        verbose_name='Категория'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Слаг категории'
+    )
 
     def __str__(self):
         return self.name
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Жанр')
-    slug = models.SlugField(unique=True, verbose_name='Слаг жанра')
+    name = models.CharField(
+        max_length=255, 
+        verbose_name='Жанр'
+    )
+    slug = models.SlugField(
+        unique=True, 
+        verbose_name='Слаг жанра'
+    )
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Произведение')
+    name = models.CharField(
+        max_length=255, 
+        verbose_name='Произведение'
+    )
     description = models.TextField(verbose_name='Описание')
     year = models.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)], verbose_name='Год'
+        validators=[MaxValueValidator(timezone.now().year)], 
+        verbose_name='Год'
     )
     category = models.ForeignKey(
         Category,
