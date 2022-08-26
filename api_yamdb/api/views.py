@@ -17,10 +17,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.serializers import (SignUpSerializer, TokenGetSerializer,
                              CategorySerializer, UserAuthorSerializer,
                              UserSerializer, GenreSerializer,
-                             TitleSerializer, TitlesSerializer)
-from api.permissions import IsAdminOnly, AdminOrReadOnlyPermission
+                             TitleSerializer, TitlesSerializer,
+                             ReviewSerializer, CommentsSerializer)
+from api.permissions import (IsAdminOnly, AdminOrReadOnlyPermission,
+                             ReviewCommentsPermission)
 
-from reviews.models import User, Category, Genre, Title
+from reviews.models import User, Category, Genre, Title, Review
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -149,3 +151,33 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer = CategorySerializer(category)
         category.delete()
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [ReviewCommentsPermission, ]
+
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,
+                        title=self.get_title())
+    
+    def get_queryset(self):
+        return self.get_title().reviews
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentsSerializer
+    permission_classes = [ReviewCommentsPermission, ]
+
+    def get_review(self):
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.get_review())
+
+    def get_queryset(self):
+        return self.get_review().comments

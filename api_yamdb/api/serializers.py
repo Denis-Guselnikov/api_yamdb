@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.utils import timezone
 
-from reviews.models import User, Category, Genre, Title
+from reviews.models import User, Category, Genre, Title, Review, Comments
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -109,3 +109,30 @@ class TitleSerializer(serializers.ModelSerializer):
         if not rating:
             return rating
         return round(rating, 1)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+    
+        validators = (
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=['author', 'title'],
+                message='Нельзя добавить второй отзыв на то же самое произведение'
+            ),
+        )
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username', read_only=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comments
+        read_only_fields = ('review', )
