@@ -117,6 +117,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Review
+    
+        validators = (
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=['author', 'title'],
+                message='Нельзя добавить второй отзыв на то же самое произведение'
+            ),
+        )
 
 
 class CommentsSerializer(serializers.ModelSerializer):
@@ -127,4 +135,4 @@ class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comments
-        read_only_fields = ('post', )
+        read_only_fields = ('review', )
