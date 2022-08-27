@@ -21,11 +21,10 @@ class AdminOrReadOnlyPermission(permissions.BasePermission):
 
 
 class ReviewCommentsPermission(permissions.BasePermission):
-    """Для reviews и comments"""
+    """Для reviews и comments"""   
     def has_object_permission(self, request, view, obj):
-        if request.method == 'POST' and request.user.is_authenticated:
-            return True
-        return (request.method in ('PATCH', 'DELETE')
-                and request.user == obj.author
-                or request.user.is_admin
-                or request.user.is_stuff)
+        return (request.method in permissions.SAFE_METHODS
+                or (request.user.is_authenticated
+                    and (obj.author == request.user
+                         or request.user.is_admin
+                         or request.user.is_moderator)))

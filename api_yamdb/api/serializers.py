@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from django.db.models import Avg
 from django.utils import timezone
 
@@ -7,6 +7,10 @@ from reviews.models import User, Category, Genre, Title, Review, Comments
 
 
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
@@ -27,6 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserAuthorSerializer(serializers.ModelSerializer):
     role = serializers.CharField(read_only=True)
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
     class Meta:
         model = User
@@ -112,27 +119,28 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
-
-    class Meta:
-        fields = '__all__'
-        model = Review
-    
-        validators = (
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=['author', 'title'],
-                message='Нельзя добавить второй отзыв на то же самое произведение'
-            ),
-        )
-
-
-class CommentsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
+    title = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('__all__')
+        model = Review    
+       
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        fields = ('__all__')
         model = Comments
-        read_only_fields = ('review', )
+                

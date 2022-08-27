@@ -93,6 +93,12 @@ class Review(models.Model):
         validators=[MaxValueValidator(10)]
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_review')
+        ]
+
 
 class Comments(models.Model):
     author = models.ForeignKey(
