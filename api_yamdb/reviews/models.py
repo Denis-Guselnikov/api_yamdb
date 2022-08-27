@@ -146,11 +146,11 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        max_length=255, 
+        max_length=255,
         verbose_name='Жанр'
     )
     slug = models.SlugField(
-        unique=True, 
+        unique=True,
         verbose_name='Слаг жанра'
     )
 
@@ -160,12 +160,12 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(
-        max_length=255, 
+        max_length=255,
         verbose_name='Произведение'
     )
     description = models.TextField(verbose_name='Описание')
     year = models.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)], 
+        validators=[MaxValueValidator(timezone.now().year)],
         verbose_name='Год'
     )
     category = models.ForeignKey(

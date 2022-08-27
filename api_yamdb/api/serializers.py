@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.utils import timezone
 
@@ -7,9 +7,6 @@ from reviews.models import User, Category, Genre, Title, Review, Comments
 
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
 
     class Meta:
         model = User
@@ -31,9 +28,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserAuthorSerializer(serializers.ModelSerializer):
     role = serializers.CharField(read_only=True)
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
 
     class Meta:
         model = User
@@ -42,7 +36,8 @@ class UserAuthorSerializer(serializers.ModelSerializer):
                   'role', 'confirmation_code')
 
 
-class SignUpSerializer(serializers.ModelSerializer):    
+class SignUpSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ('username', 'email',)
@@ -131,8 +126,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('__all__')
-        model = Review    
-       
+        model = Review
+
 
 class CommentsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -143,4 +138,3 @@ class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('__all__')
         model = Comments
-                

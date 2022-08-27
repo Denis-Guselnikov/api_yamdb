@@ -5,9 +5,9 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import TitleFilter
 
-from rest_framework import filters, serializers, status
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework import filters, serializers, status, viewsets
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
@@ -94,7 +94,7 @@ def get_token(request):
                 'confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
             return Response({'token': str(token)},
-                            status=status.HTTP_201_CREATED)               
+                            status=status.HTTP_201_CREATED)
         return Response(
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
@@ -152,7 +152,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
-class ReviewViewSet(viewsets.ModelViewSet):    
+class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [ReviewCommentsPermission, IsAuthenticatedOrReadOnly]
 
@@ -163,7 +163,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         if Review.objects.filter(author=self.request.user,
-                                 title=title).exists():                                
+                                 title=title).exists():
             raise serializers.ValidationError()
         else:
             serializer.save(author=self.request.user, title=title)
@@ -171,7 +171,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
-    permission_classes = [ReviewCommentsPermission,  IsAuthenticatedOrReadOnly]
+    permission_classes = [ReviewCommentsPermission, IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -181,6 +181,4 @@ class CommentsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         review = title.reviews.get(pk=self.kwargs.get('review_id'))
-        serializer.save(author=self.request.user, review=review) 
-
-    
+        serializer.save(author=self.request.user, review=review)
