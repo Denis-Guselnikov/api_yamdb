@@ -1,11 +1,11 @@
-from django.conf import settings
+from rest_framework import filters, serializers, status, viewsets
+
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import TitleFilter
 
-from rest_framework import filters, serializers, status, viewsets
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.filters import SearchFilter
@@ -22,6 +22,7 @@ from api.permissions import (IsAdminOnly, AdminOrReadOnlyPermission,
                              ReviewCommentsPermission)
 
 from reviews.models import User, Category, Genre, Title, Review
+from django.conf import settings
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -106,12 +107,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    permission_classes = [AdminOrReadOnlyPermission]
+    permission_classes = [AdminOrReadOnlyPermission]    
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH',):
             return TitlesSerializer
-        return TitleSerializer
+        return TitleSerializer        
 
 
 class GenreViewSet(viewsets.ModelViewSet):

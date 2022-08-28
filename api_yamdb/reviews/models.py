@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MaxValueValidator
-from django.utils import timezone
+
+from .utils import validate_year
 
 ROLES = [
     ('admin', 'admin'),
@@ -100,7 +101,7 @@ class Review(models.Model):
         ]
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -165,7 +166,7 @@ class Title(models.Model):
     )
     description = models.TextField(verbose_name='Описание')
     year = models.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)],
+        validators=[validate_year],
         verbose_name='Год'
     )
     category = models.ForeignKey(
@@ -174,12 +175,12 @@ class Title(models.Model):
         null=True,
         blank=True,
         verbose_name='Категория',
-        related_name='category'
+        related_name='titles'
     )
     genre = models.ManyToManyField(
         Genre,
         verbose_name='Жанр',
-        related_name='genre'
+        related_name='titles'
     )
 
     def __str__(self):

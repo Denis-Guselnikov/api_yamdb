@@ -1,9 +1,10 @@
 from rest_framework import serializers
+
 from rest_framework.validators import UniqueTogetherValidator
 from django.db.models import Avg
 from django.utils import timezone
 
-from reviews.models import User, Category, Genre, Title, Review, Comments
+from reviews.models import User, Category, Genre, Title, Review, Comment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -62,15 +63,15 @@ class TokenGetSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Category
-        fields = ('name', 'slug')
+        model = Category        
+        exclude = ['id']
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Genre
-        fields = ('name', 'slug')
+        model = Genre        
+        exclude = ['id']
 
 
 class TitlesSerializer(serializers.ModelSerializer):
@@ -137,4 +138,4 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('__all__')
-        model = Comments
+        model = Comment
