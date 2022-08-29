@@ -18,13 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
                       fields=("email",),
                       message="Данная почта уже числится в БД",)]
 
-    def validate_username(self, value):
-        """Проверяем, пытается ли пользователь
-         использовать "me" в качестве имени пользователя"""
-        if value.lower() == 'me':
-            raise serializers.ValidationError("Недопустимое имя пользователя")
-        return value
-
 
 class UserAuthorSerializer(serializers.ModelSerializer):
     role = serializers.CharField(read_only=True)
@@ -41,13 +34,6 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email',)
-
-    def validate_username(self, value):
-        """Проверяем, пытается ли пользователь
-         использовать "me" в качестве имени пользователя"""
-        if value.lower() == 'me':
-            raise serializers.ValidationError("Недопустимое имя пользователя")
-        return value
 
 
 class TokenGetSerializer(serializers.ModelSerializer):
