@@ -11,3 +11,11 @@ def validate_year(value):
             'Укажите год создания произведения.'
         )
     return value
+
+
+def validate_username(value):
+    """Проверяем, пытается ли пользователь
+        использовать "me" в качестве имени пользователя"""
+    if value.lower() == 'me':
+        raise serializers.ValidationError("Недопустимое имя пользователя")
+    return value

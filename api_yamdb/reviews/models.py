@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MaxValueValidator
 
-from .utils import validate_year
+from .utils import validate_username, validate_year
 
 USER = 'user'
 ADMIN = 'admin'
@@ -18,6 +18,7 @@ ROLES = [
 class User(AbstractUser):
     username = models.CharField(
         'Имя пользователя',
+        validators=[validate_username],
         max_length=150,
         unique=True,
         blank=False,
