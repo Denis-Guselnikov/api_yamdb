@@ -4,10 +4,14 @@ from django.core.validators import MaxValueValidator
 
 from .utils import validate_year
 
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+
 ROLES = [
-    ('admin', 'admin'),
-    ('moderator', 'moderator'),
-    ('user', 'user')
+    (ADMIN, ADMIN),
+    (MODERATOR, MODERATOR),
+    (USER, USER)
 ]
 
 
@@ -44,7 +48,7 @@ class User(AbstractUser):
         'Роль',
         max_length=255,
         choices=ROLES,
-        default='user',
+        default=USER,
         blank=True
     )
     confirmation_code = models.CharField(
@@ -57,15 +61,15 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_superuser or self.role == 'admin'
+        return self.is_superuser or self.role == ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == MODERATOR
 
     @property
     def is_user(self):
-        return self.role == 'user'
+        return self.role == USER
 
 
 class Review(models.Model):

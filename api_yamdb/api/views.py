@@ -34,13 +34,6 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
 
-    def perform_create(self, serializer):
-        email = self.request.data.get('email')
-        if User.objects.filter(email=email):
-            return Response('Данная почта уже числится в БД',
-                            status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
-
     @action(methods=['GET', 'PATCH'],
             detail=False,
             permission_classes=[IsAuthenticated])
@@ -52,55 +45,51 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserAuthorSerializer(request.user,
                                               data=request.data,
                                               partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
 def send_code(request):
     """Получение кода подтверждения на почту для регистрации на проекте."""
     serializer = SignUpSerializer(data=request.data)
-    if serializer.is_valid():
-        user = User.objects.create(
-            username=serializer.validated_data['username'],
-            email=serializer.validated_data['email'],
-        )
-        token = default_token_generator.make_token(user)
-        user.token = token
-        user.save()
-        send_mail(
-            'Регистрация пользователя',
-            (f'Вы получили код подтверждения регистрации на почтовый адрес.\n'
-             f'Почта: {user.email}\n' f'Код подтверждения: {user.token}'),
-            f'{settings.EMAIL_FROM}',
-            [user.email],
-            fail_silently=False,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    user = User.objects.create(
+        username=serializer.validated_data['username'],
+        email=serializer.validated_data['email'],
+    )
+    token = default_token_generator.make_token(user)
+    user.token = token
+    user.save()
+    send_mail(
+        'Регистрация пользователя',
+        (f'Вы получили код подтверждения регистрации на почтовый адрес.\n'
+            f'Почта: {user.email}\n' f'Код подтверждения: {user.token}'),
+        f'{settings.EMAIL_FROM}',
+        [user.email],
+        fail_silently=False,
+    )
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
 def get_token(request):
     """Получение JWT-токена при передаче username и confirmation code."""
     serializer = TokenGetSerializer(data=request.data)
-    if serializer.is_valid():
-        user = get_object_or_404(
-            User,
-            username=serializer.validated_data['username']
-        )
-        if serializer.validated_data.get(
-                'confirmation_code') == user.confirmation_code:
-            token = RefreshToken.for_user(user).access_token
-            return Response({'token': str(token)},
-                            status=status.HTTP_201_CREATED)
-        return Response(
-            {'confirmation_code': 'Неверный код подтверждения!'},
-            status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    user = get_object_or_404(
+        User,
+        username=serializer.validated_data['username']
+    )
+    if serializer.validated_data.get(
+            'confirmation_code') == user.confirmation_code:
+        token = RefreshToken.for_user(user).access_token
+        return Response({'token': str(token)},
+                        status=status.HTTP_201_CREATED)
+    return Response(
+        {'confirmation_code': 'Неверный код подтверждения!'},
+        status=status.HTTP_400_BAD_REQUEST)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

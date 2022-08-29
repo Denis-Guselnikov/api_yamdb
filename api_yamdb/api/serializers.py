@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         """Проверяем, пытается ли пользователь
          использовать "me" в качестве имени пользователя"""
-        if value == 'me':
+        if value.lower() == 'me':
             raise serializers.ValidationError("Недопустимое имя пользователя")
         return value
 
@@ -45,7 +45,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         """Проверяем, пытается ли пользователь
          использовать "me" в качестве имени пользователя"""
-        if value == 'me':
+        if value.lower() == 'me':
             raise serializers.ValidationError("Недопустимое имя пользователя")
         return value
 
