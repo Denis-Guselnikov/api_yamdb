@@ -13,7 +13,7 @@ def validate_year(value):
     return value
 
 
-def validate_username(self, value):
+def validate_username(value):
     """Проверяем, пытается ли пользователь
         использовать "me" в качестве имени пользователя"""
     if value.lower() == 'me':
