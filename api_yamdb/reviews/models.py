@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .utils import validate_username, validate_year
 
@@ -96,10 +96,14 @@ class Review(models.Model):
     score = models.IntegerField(
         verbose_name='Оценка',
         null=True,
-        validators=[MaxValueValidator(10)]
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ]
     )
 
     class Meta:
+        ordering = ['-pub_date']
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'], name='unique_review')
@@ -129,11 +133,11 @@ class Comment(models.Model):
         db_index=True
     )
 
-    def __str__(self):
-        return self.text
-
     class Meta:
         ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text
 
 
 class Category(models.Model):
