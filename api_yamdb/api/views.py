@@ -1,4 +1,4 @@
-from rest_framework import filters, serializers, status, viewsets, mixins
+from rest_framework import filters, status, viewsets, mixins
 
 from django.db.models import Avg
 from django.contrib.auth.tokens import default_token_generator
@@ -22,7 +22,7 @@ from api.serializers import (SignUpSerializer, TokenGetSerializer,
 from api.permissions import (IsAdminOnly, AdminOrReadOnlyPermission,
                              ReviewCommentsPermission)
 
-from reviews.models import User, Category, Genre, Title, Review
+from reviews.models import User, Category, Genre, Title
 from django.conf import settings
 
 
@@ -139,11 +139,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        if Review.objects.filter(author=self.request.user,
-                                 title=title).exists():
-            raise serializers.ValidationError()
-        else:
-            serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):

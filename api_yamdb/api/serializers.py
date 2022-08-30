@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from rest_framework.validators import UniqueTogetherValidator
-# from django.db.models import Avg
 
 from reviews.models import User, Category, Genre, Title, Review, Comment
+
+from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -98,6 +99,21 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+
+    def validate(self, data):
+        if self.context['request'].method != 'POST':
+            return data
+        title_id = (
+            self.context['request'].parser_context['kwargs']['title_id']
+        )
+        title = get_object_or_404(Title, pk=title_id)
+        user = self.context['request'].user
+        review = Review.objects.filter(author=user, title=title).exists()
+        if review:
+            raise serializers.ValidationError(
+                'Вы уже оставили отзыв на это произведение'
+            )
+        return data
 
     class Meta:
         fields = ('__all__')
