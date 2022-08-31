@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from django.shortcuts import get_object_or_404
 
 from reviews.models import User, Category, Genre, Title, Review, Comment
+from reviews.utils import validate_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,7 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
         validators = [UniqueTogetherValidator(
                       queryset=User.objects.all(),
                       fields=("email",),
-                      message="Данная почта уже числится в БД",)]
+                      message="Данная почта уже числится в БД",),
+                      validate_username]
 
 
 class UserAuthorSerializer(serializers.ModelSerializer):
@@ -33,6 +35,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email',)
+        validators = [validate_username]
 
 
 class TokenGetSerializer(serializers.ModelSerializer):
