@@ -1,10 +1,8 @@
 from rest_framework import serializers
-
 from rest_framework.validators import UniqueTogetherValidator
+from django.shortcuts import get_object_or_404
 
 from reviews.models import User, Category, Genre, Title, Review, Comment
-
-from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):

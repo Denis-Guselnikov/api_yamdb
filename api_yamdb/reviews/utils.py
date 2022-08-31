@@ -1,6 +1,7 @@
 from rest_framework import serializers
-
 from django.utils import timezone
+
+INVALID_NAME = ['me', 'Me', 'ME']
 
 
 def validate_year(value):
@@ -16,6 +17,6 @@ def validate_year(value):
 def validate_username(value):
     """Проверяем, пытается ли пользователь
         использовать "me" в качестве имени пользователя"""
-    if value.lower() == 'me':
+    if value in INVALID_NAME:
         raise serializers.ValidationError("Недопустимое имя пользователя")
     return value
